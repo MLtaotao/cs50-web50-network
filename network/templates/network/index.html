@@ -1,5 +1,26 @@
 {% extends "network/layout.html" %}
+{% load static %}
+{% load humanize %}
 
 {% block body %}
-    TODO
+    {% if user.is_authenticated %}
+        <hr>
+        <button id="newpost-btn" type="button" class="btn btn-primary">New Post</button>
+        <div id= 'newpost' style="display: none;">
+            <form id= 'newpost_form' action="{% url 'new' %}" method="POST">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-outline-secondary">Post</button>
+            </form>
+        </div>
+
+    {% endif %}
+
+    <hr>
+    <div id= "all-post"></div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/index.js' %}"></script>
 {% endblock %}
