@@ -4,16 +4,22 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 
-from .models import User, Post
+from .models import User, Post, Follow
 from .forms import PostForm
 
 
 def index(request):
     form = PostForm()
     form.fields['body'].label = False
+    posts = Post.objects.all().order_by('-post_time')
+    paginator = Paginator(posts, 3)
+    page_number = request.GET.get('page')
+    page_obj= paginator.get_page(page_number)
     return render(request, "network/index.html", {
-        'form': form
+        'form': form,
+        'page_obj': page_obj
     })
 
 
@@ -77,6 +83,57 @@ def new_post(request):
     p.save()
     return HttpResponseRedirect(reverse("index"))
 
-def all_post(request):
-    posts = Post.objects.all().order_by('-post_time')
-    return JsonResponse([post.serialize() for post in posts], safe= False)
+def profile(request, user_id):
+    '''
+    Profile Page:
+    1.the number of followers
+    2.the number of people that the user follows
+    3.all of the posts for that user, in reverse chronological order.
+    '''
+    user = User.objects.get(id = user_id)
+    follows = Follow.objects.filter(follower= user).count()
+    followers = Follow.objects.filter(user= user).count()
+    user_posts = Post.objects.filter(poster= user).order_by('-post_time')
+    follow_boolean = Follow.objects.filter(user= user, follower= request.user)
+
+    paginator = Paginator(user_posts, 3)
+    page_number = request.GET.get('page')
+    page_obj= paginator.get_page(page_number)
+
+    return render(request, "network/profile.html", {
+        "profile_user": user,
+        "follows": follows,
+        "followers": followers,
+        'page_obj': page_obj,
+        "follow_boolean": follow_boolean
+    })
+
+def follow(request, user_id, follower_id):
+    user = User.objects.get(id = user_id)
+    follower = User.objects.get(id = follower_id)
+    f = Follow(user= user, follower= follower)
+    f.save()
+    return JsonResponse({"message": "Follow the user successfully."}, status=201)
+
+def unfollow(request, user_id, follower_id):
+    user = User.objects.get(id = user_id)
+    follower = User.objects.get(id = follower_id)
+    uf = Follow.objects.get(user= user, follower= follower)
+    uf.delete()
+    return JsonResponse({"message": "Unfollow the user successfully."}, status=201)
+
+@login_required
+def follow_posts(request):
+    form = PostForm()
+    form.fields['body'].label = False
+    follow_users = [follow.user for follow in Follow.objects.filter(follower= request.user)]
+    follow_posts = Post.objects.filter(poster__in= follow_users).order_by('-post_time')
+
+    paginator = Paginator(follow_posts, 3)
+    page_number = request.GET.get('page')
+    page_obj= paginator.get_page(page_number)
+
+    return render(request, 'network/follow.html', {
+        'form': form,
+        'page_obj': page_obj,
+    })

@@ -1,0 +1,43 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% load bootstrap_pagination %}
+
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <hr>
+        <button id="newpost-btn" type="button" class="btn btn-primary">New Post</button>
+        <div id= 'newpost' style="display: none;">
+            <form id= 'newpost_form' action="{% url 'new' %}" method="POST">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-outline-secondary">Post</button>
+            </form>
+        </div>
+
+    {% endif %}
+
+    <hr>
+    <div id= "follow-post">
+        {% for post in page_obj %}
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'profile' post.poster.id %}">{{ post.poster }}</a></h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ post.post_time|naturaltime }}</h6>
+                    {{ post.body|safe }}
+                    <a href="#" class="card-link">Like</a>
+                    <a href="#" class="card-link">Unlike</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% bootstrap_paginate page_obj range=3 show_prev_next="false" show_first_last="true" %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/index.js' %}"></script>
+{% endblock %}

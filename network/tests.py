@@ -2,7 +2,7 @@ from django.test import Client, TestCase
 import unittest
 from datetime import datetime
 
-from .models import User, Post
+from .models import User, Post, Like, Follow
 
 # Create your tests here.
 class NetworkTestCase(TestCase):
@@ -36,5 +36,15 @@ class NetworkTestCase(TestCase):
             poster = User.objects.get(username='abc'),
             body = 'abcdef'
         )
+
+    def new_like(self):
+        p1 = Post.objects.get(pk = 1)
+        u2 = User.objects.get(username= 'def')
+        l1 = Like(post= p1, liker = 2)
+
+    def new_follow(self):
+        u1 = User.objects.get(username= 'abc')
+        u2 = User.objects.get(username= 'def')
+        f1 = Follow(user= u1, follower= u2)
 
  

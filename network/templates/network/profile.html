@@ -1,0 +1,54 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% load humanize %}
+{% load bootstrap_pagination %}
+
+{% block body %}
+    <div>
+        <h1 style="text-align: center;">{{ profile_user.username }}</h1>
+        {% if user != profile_user %}
+            {% if follow_boolean %}
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-danger" 
+                    data-profile_id= "{{ profile_user.id }}" 
+                    data-user_id="{{ user.id }}" 
+                    id = "profile_unfollow">Unfollow</button>
+                </div>
+            {% else %}
+                <div style="text-align: center">
+                    <button type="button" class="btn btn-primary" 
+                    data-profile_id= "{{ profile_user.id }}" 
+                    data-user_id="{{ user.id }}" 
+                    id = "profile_follow">Follow</button>
+                </div>
+            {% endif %}
+        {% endif %}
+        <div class="row">
+            <div class="col" style="text-align: right;">
+              Follows: {{ follows }}
+            </div>
+            <div class="col" style="text-align: left;">
+              Followers: {{ followers }}
+            </div>
+          </div>
+    </div>
+
+    <hr>
+    {% for post in page_obj %}
+        <div class="card text-center">
+            <div class="card-body">
+                {{ post.body|safe }}
+                <h6 class="card-subtitle mb-2 text-muted">{{ post.post_time|naturaltime }}</h6>
+                <a href="#" class="card-link">Like</a>
+                <a href="#" class="card-link">Unlike</a>
+            </div>
+        </div>
+    {% endfor %}
+    
+    {% bootstrap_paginate page_obj range=3 show_prev_next="false" show_first_last="true" %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/profile.js' %}"></script>
+{% endblock %}

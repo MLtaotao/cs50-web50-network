@@ -18,4 +18,3 @@ function show_newpost() {
         document.querySelector('#newpost-btn').className = "btn btn-primary";
     }
 }
-
