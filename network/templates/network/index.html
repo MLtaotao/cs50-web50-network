@@ -2,11 +2,9 @@
 {% load static %}
 {% load humanize %}
 {% load bootstrap_pagination %}
-
-{% block script %}
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+{% block extrahead %}
+    <script>window.CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/';</script>
+    {{ block.super }}
 {% endblock %}
 
 {% block body %}
@@ -25,7 +23,7 @@
     {% endif %}
 
     <hr>
-    <div id= "all-post">
+    <div id= "all-posts">
         {% for post in page_obj %}
             <div class="card text-center">
                 <div class="card-body">
@@ -36,40 +34,21 @@
                     <a href="#" class="card-link">Unlike</a>
                 </div>
                 {% if user == post.poster %}
-                    <div style="position: absolute; right:10px; bottom:10px;">
-                        <button type="button" class="btn btn-secondary btn-sm"
-                        data-toggle="modal" data-target="#exampleModal">Edit</button>
-                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm" 
+                    id="post-edit-button" data-post_id="{{ post.pk }}"
+                    style="position: absolute; right:10px; bottom:10px;">Edit</button>
                 {% endif %}
             </div>
         {% endfor %}
-    </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
-            <div class="modal-body">
-            ...
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-        </div>
     </div>
   
     {% bootstrap_paginate page_obj range=3 show_prev_next="false" show_first_last="true" %}
 {% endblock %}
 
+
 {% block script %}
     <script src="{% static 'network/index.js' %}"></script>
     <script src="{% static 'network/edit.js' %}"></script>
+    <script src="{% static 'ckeditor4/ckeditor.js' %}"></script>
 {% endblock %}

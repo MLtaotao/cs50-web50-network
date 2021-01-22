@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseNotAllowed
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -137,3 +137,11 @@ def follow_posts(request):
         'form': form,
         'page_obj': page_obj,
     })
+
+@login_required
+def edit_posts(request, post_id):
+    post = Post.objects.get(id= post_id)
+    if request.user == post.poster and request.method == 'POST':
+        pass
+    else:
+        return HttpResponseNotAllowed()
