@@ -155,3 +155,21 @@ def edit_post(request):
         return JsonResponse({"message": "Post edit successfully."}, status=201)
     else:
         return JsonResponse({'error': "Invalid user or wrong method"}, status=404)
+
+@login_required(login_url='/login')
+def like_post(request):
+    if request.method == 'PUT':
+        data = json.loads(request.body)
+        post_id = data.get("post_id", "")
+        post = Post.objects.get(id= post_id)
+        if request.user in post.like.all():
+            post.like.remove(request.user)
+            post.save()
+            return JsonResponse({"message": "Unlike the post successfully."}, status=201)
+
+        else:
+            post.like.add(request.user)
+            post.save()
+            return JsonResponse({"message": "Like the post successfully."}, status=201)
+    else:
+        return JsonResponse({"error": "PUT request required."}, status=400)

@@ -30,7 +30,7 @@
             <div class="col" style="text-align: left;">
               Followers: {{ followers }}
             </div>
-          </div>
+        </div>
     </div>
 
     <hr>
@@ -39,13 +39,24 @@
             <div class="card-body">
                 <div id="post-body">{{ post.body|safe }}</div>
                 <h6 class="card-subtitle mb-2 text-muted">{{ post.post_time|naturaltime }}</h6>
-                <a href="#" class="card-link">Like</a>
-                <a href="#" class="card-link">Unlike</a>
+                {% if user.is_authenticated %}
+                    <a class="card-link" id="post-like" data-post_id="{{ post.id }}">
+                        ❤️
+                        {% if post.like.count > 0 %}
+                            <span class="badge badge-light">{{post.like.count}}</span>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    ❤️
+                    {% if post.like.count > 0 %}
+                        <span class="badge badge-light">{{post.like.count}}</span>
+                    {% endif %}
+                {% endif %}
             </div>
             {% if user == post.poster %}
             <button type="button" class="btn btn-secondary btn-sm" 
             id="post-edit-button" data-post_id="{{ post.pk }}"
-            data-post_body = "{{ post.body|safe }}"
+            data-post_body = "{{ post.body }}"
             style="position: absolute; right:10px; bottom:10px;">Edit</button>
             {% endif %}
         </div>
@@ -59,4 +70,5 @@
     <script src="{% static 'network/profile.js' %}"></script>
     <script src="{% static 'network/edit.js' %}"></script>
     <script src="{% static 'ckeditor4/ckeditor.js' %}"></script>
+    <script src="{% static 'network/like.js' %}"></script>
 {% endblock %}

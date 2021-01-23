@@ -27,8 +27,19 @@
                     <h5 class="card-title"><a href="{% url 'profile' post.poster.id %}">{{ post.poster }}</a></h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ post.post_time|naturaltime }}</h6>
                     {{ post.body|safe }}
-                    <a href="#" class="card-link">Like</a>
-                    <a href="#" class="card-link">Unlike</a>
+                    {% if user.is_authenticated %}
+                        <a class="card-link" id="post-like" data-post_id="{{ post.id }}">
+                            ❤️
+                            {% if post.like.count > 0 %}
+                                <span class="badge badge-light">{{post.like.count}}</span>
+                            {% endif %}
+                        </a>
+                    {% else %}
+                        ❤️
+                        {% if post.like.count > 0 %}
+                            <span class="badge badge-light">{{post.like.count}}</span>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
@@ -40,4 +51,5 @@
 
 {% block script %}
     <script src="{% static 'network/index.js' %}"></script>
+    <script src="{% static 'network/like.js' %}"></script>
 {% endblock %}
