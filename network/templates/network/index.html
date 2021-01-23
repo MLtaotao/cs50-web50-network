@@ -2,10 +2,6 @@
 {% load static %}
 {% load humanize %}
 {% load bootstrap_pagination %}
-{% block extrahead %}
-    <script>window.CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/';</script>
-    {{ block.super }}
-{% endblock %}
 
 {% block body %}
     {% if user.is_authenticated %}
@@ -29,19 +25,22 @@
                 <div class="card-body">
                     <h5 class="card-title"><a href="{% url 'profile' post.poster.pk %}">{{ post.poster }}</a></h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ post.post_time|naturaltime }}</h6>
-                    {{ post.body|safe }}
+                    <div id="post-body">{{ post.body|safe }}</div>
                     <a href="#" class="card-link">Like</a>
                     <a href="#" class="card-link">Unlike</a>
                 </div>
                 {% if user == post.poster %}
                     <button type="button" class="btn btn-secondary btn-sm" 
                     id="post-edit-button" data-post_id="{{ post.pk }}"
+                    data-post_body = "{{ post.body|safe }}"
                     style="position: absolute; right:10px; bottom:10px;">Edit</button>
                 {% endif %}
             </div>
         {% endfor %}
 
     </div>
+
+
   
     {% bootstrap_paginate page_obj range=3 show_prev_next="false" show_first_last="true" %}
 {% endblock %}

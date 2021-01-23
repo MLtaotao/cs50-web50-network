@@ -5,6 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, Post, Follow
 from .forms import PostForm
@@ -139,9 +141,17 @@ def follow_posts(request):
     })
 
 @login_required
-def edit_posts(request, post_id):
-    post = Post.objects.get(id= post_id)
-    if request.user == post.poster and request.method == 'POST':
-        pass
+def edit_post(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        post_id = data.get("post_id", "")
+        post_body = data.get("edit_body", "")
+        post = Post.objects.get(id= post_id)
+        if request.user == post.poster:
+            post.body = post_body
+            post.save()
+        return JsonResponse({"message": "Post edit successfully."}, status=201)
     else:
-        return HttpResponseNotAllowed()
+        return JsonResponse({'error': "Invalid user or wrong method"}, status=404)

@@ -37,11 +37,17 @@
     {% for post in page_obj %}
         <div class="card text-center">
             <div class="card-body">
-                {{ post.body|safe }}
+                <div id="post-body">{{ post.body|safe }}</div>
                 <h6 class="card-subtitle mb-2 text-muted">{{ post.post_time|naturaltime }}</h6>
                 <a href="#" class="card-link">Like</a>
                 <a href="#" class="card-link">Unlike</a>
             </div>
+            {% if user == post.poster %}
+            <button type="button" class="btn btn-secondary btn-sm" 
+            id="post-edit-button" data-post_id="{{ post.pk }}"
+            data-post_body = "{{ post.body|safe }}"
+            style="position: absolute; right:10px; bottom:10px;">Edit</button>
+            {% endif %}
         </div>
     {% endfor %}
     
@@ -51,4 +57,6 @@
 
 {% block script %}
     <script src="{% static 'network/profile.js' %}"></script>
+    <script src="{% static 'network/edit.js' %}"></script>
+    <script src="{% static 'ckeditor4/ckeditor.js' %}"></script>
 {% endblock %}
